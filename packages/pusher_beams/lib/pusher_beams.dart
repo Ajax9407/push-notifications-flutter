@@ -234,8 +234,11 @@ class PusherBeams extends PusherBeamsPlatform with CallbackHandlerApi {
   ///
   /// Throws an [Exception] in case of failure.
   @override
-  Future<void> setUserId(String userId, BeamsAuthProvider provider,
-      OnUserCallback callback) async {
+  Future<void> setUserId(
+    String userId,
+    BeamsAuthProvider provider,
+    OnUserCallback callback,
+  ) async {
     final callbackId = _uuid.v4();
 
     if (!kIsWeb) {
@@ -243,7 +246,10 @@ class PusherBeams extends PusherBeamsPlatform with CallbackHandlerApi {
     }
 
     await _pusherBeamsApi.setUserId(
-        userId, provider, kIsWeb ? callback : callbackId);
+      userId,
+      provider,
+      kIsWeb ? callback : callbackId,
+    );
   }
 
   /// This function register this device to *Pusher Beams* service with the given [instanceId].
@@ -308,15 +314,17 @@ class PusherBeams extends PusherBeamsPlatform with CallbackHandlerApi {
 
   @override
   Future<void> onMessageReceivedInTheForeground(
-      OnMessageReceivedInTheForeground callback) async {
+    OnMessageReceivedInTheForeground callback,
+  ) async {
     final callbackId = _uuid.v4();
 
     if (!kIsWeb) {
       _callbacks[callbackId] = callback;
     }
 
-    await _pusherBeamsApi
-        .onMessageReceivedInTheForeground(kIsWeb ? callback : callbackId);
+    await _pusherBeamsApi.onMessageReceivedInTheForeground(
+      kIsWeb ? callback : callbackId,
+    );
   }
 
   /// Handler which receives callbacks from the native platforms.
@@ -333,6 +341,9 @@ class PusherBeams extends PusherBeamsPlatform with CallbackHandlerApi {
         callback((args[0] as List<Object?>).cast<String>());
         return;
       case "setUserId":
+        if (args.isEmpty) {
+          return;
+        }
         callback(args[0] as String?);
         return;
       case "onMessageReceivedInTheForeground":
